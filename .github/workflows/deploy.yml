@@ -1,9 +1,9 @@
-name: Deploy React Frontend to EC2
+name: Deploy Vite Frontend to EC2
 
 on:
   push:
     branches:
-      - main  # or your default branch
+      - main
 
 jobs:
   build-and-deploy:
@@ -16,22 +16,30 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '18'  # use your Node version
+          node-version: '18'
 
       - name: Install dependencies
         run: npm install
 
-      - name: Build React app
+      - name: Build Vite app
         run: npm run build
 
-      - name: Deploy to EC2 via SSH
+      - name: Upload dist folder to EC2
+        uses: appleboy/scp-action@v0.1.4
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ubuntu
+          key: ${{ secrets.EC2_SSH_KEY }}
+          source: "dist/*"
+          target: "/home/ubuntu/vite-dist"
+
+      - name: Deploy on EC2
         uses: appleboy/ssh-action@v0.1.7
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ubuntu
           key: ${{ secrets.EC2_SSH_KEY }}
-          port: 22
           script: |
             sudo rm -rf /var/www/html/*
-            sudo cp -r build/* /var/www/html/
+            sudo cp -r /home/ubuntu/vite-dist/* /var/www/html/
             sudo systemctl restart nginx
