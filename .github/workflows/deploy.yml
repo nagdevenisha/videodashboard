@@ -42,4 +42,5 @@ jobs:
           script: |
             sudo rm -rf /var/www/html/*
             sudo cp -r /home/ubuntu/vite-dist/dist/* /var/www/html/
+            ls -l /var/www/html/
             sudo systemctl restart nginx
