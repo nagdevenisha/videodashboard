@@ -40,7 +40,9 @@ jobs:
           username: ubuntu
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
+            script: |
             sudo rm -rf /var/www/html/*
+            sudo rm -rf /home/ubuntu/vite-dist/dist/*
             sudo cp -r /home/ubuntu/vite-dist/dist/* /var/www/html/
-            ls -l /var/www/html/
             sudo systemctl restart nginx
+
