@@ -231,7 +231,7 @@ function App() {
       <div className="container mx-auto px-6 py-8">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-4xl font-bold text-white mb-2">Video Profile Management</h1>
+          <h1 className="text-4xl font-bold text-white mb-2">Video Profile Managements</h1>
           <p className="text-purple-200">Manage and organize your video collections</p>
         </div>
 
