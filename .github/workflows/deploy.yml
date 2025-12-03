@@ -25,9 +25,9 @@ jobs:
       - name: Build Vite app
         run: npm run build
 
-      # THIS IS THE FIX: upload only the CONTENTS of dist, directly to web root
+      # FIXED VERSION - upload only the CONTENTS of dist, directly to web root
       - name: Deploy dist directly to /var/www/html
-        uses: appleboy/scp-action@v0.1.Concurrent
+        uses: appleboy/scp-action@v0.1.4    # ← FIXED: v0.1.4, not v0.1.Concurrent
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ubuntu
