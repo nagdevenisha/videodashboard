@@ -31,7 +31,7 @@ jobs:
           username: ubuntu
           key: ${{ secrets.EC2_SSH_KEY }}
           source: "dist/*"
-          target: "/home/ubuntu/vite-dist"
+          target: "/home/ubuntu/vite-dist/dist"
 
       - name: Deploy on EC2
         uses: appleboy/ssh-action@v0.1.7
@@ -41,5 +41,5 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
             sudo rm -rf /var/www/html/*
-            sudo cp -r /home/ubuntu/vite-dist/* /var/www/html/
+            sudo cp -r /home/ubuntu/vite-dist/dist/* /var/www/html/
             sudo systemctl restart nginx
