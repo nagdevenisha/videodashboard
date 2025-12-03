@@ -33,15 +33,26 @@ jobs:
           source: "dist/"
           target: "/home/ubuntu/vite-dist"
 
-      - name: Deploy on EC2
+      - name: Deploy to EC2 + Restart Nginx
         uses: appleboy/ssh-action@v0.1.7
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ubuntu
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            sudo rm -rf /var/www/html/*
-            sudo rm -rf /home/ubuntu/vite-dist/dist/*
-            sudo cp -r /home/ubuntu/vite-dist/dist/* /var/www/html/
-            sudo systemctl restart nginx
+            # Create a clean temp directory
+            sudo rm -rf /var/www/html
+            sudo mkdir -p /var/www/html
+
+            # Copy the ACTUAL built files (not dist/dist!)
+            sudo cp -r /home/ubuntu/vite-dist/* /var/www/html/
+
+            # Fix ownership so Nginx (www-data) can read
+            sudo chown -R www-data:www-data /var/www/html
+            sudo chmod -R 755 /var/www/html
+
+            # Restart or reload Nginx
+            sudo systemctl reload nginx || sudo systemctl restart nginx
+
+            echo "Deploy completed successfully!"
 
