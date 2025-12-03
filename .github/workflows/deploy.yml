@@ -8,7 +8,6 @@ on:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -25,12 +24,27 @@ jobs:
       - name: Build Vite app
         run: npm run build
 
-      - name: Deploy with rsync (perfect for Vite + Nginx)
-        uses: burnett01/rsync-deployments@7.0.1
+      - name: Upload build to temp folder
+        uses: appleboy/scp-action@v0.1.4
         with:
-          switches: -avzr --delete
-          path: dist/
-          remote_path: /var/www/html/
-          remote_host: ${{ secrets.EC2_HOST }}
-          remote_user: ubuntu
-          remote_key: ${{ secrets.EC2_SSH_KEY }}
+          host: ${{ secrets.EC2_HOST }}
+          username: ubuntu
+          key: ${{ secrets.EC2_SSH_KEY }}
+          source: "dist/*"
+          target: "/home/ubuntu/vite-new-build/"
+          strip_components: 1
+          overwrite: true
+
+      - name: Deploy to web root & reload Nginx
+        uses: appleboy/ssh-action@v0.1.7
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ubuntu
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            sudo rsync -av --delete /home/ubuntu/vite-new-build/ /var/www/html/
+            sudo chown -R www-data:www-data /var/www/html
+            sudo chmod -R 755 /var/www/html
+            sudo systemctl reload nginx
+            rm -rf /home/ubuntu/vite-new-build
+            echo "Deploy successful!"
