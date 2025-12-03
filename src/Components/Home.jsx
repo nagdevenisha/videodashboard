@@ -232,7 +232,7 @@ function App() {
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-4xl font-bold text-white mb-2">Video Profile Managements</h1>
-          <p className="text-purple-200">Manage and organize your video collections</p>
+          <p className="text-purple-200">Manage and organize your video collections done</p>
         </div>
 
         {/* Error Alert */}
