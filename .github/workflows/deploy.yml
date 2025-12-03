@@ -25,26 +25,12 @@ jobs:
       - name: Build Vite app
         run: npm run build
 
-      # FIXED VERSION - upload only the CONTENTS of dist, directly to web root
-      - name: Deploy dist directly to /var/www/html
-        uses: appleboy/scp-action@v0.1.4    # ← FIXED: v0.1.4, not v0.1.Concurrent
+      - name: Deploy with rsync (perfect for Vite + Nginx)
+        uses: burnett01/rsync-deployments@7.0.1
         with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ubuntu
-          key: ${{ secrets.EC2_SSH_KEY }}
-          source: "dist/*"                # ← note the /*
-          target: "/var/www/html/"        # ← directly into web root
-          strip_components: 1             # ← removes the "dist" folder level
-          overwrite: true
-
-      - name: Fix permissions & reload Nginx
-        uses: appleboy/ssh-action@v0.1.7
-        with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ubuntu
-          key: ${{ secrets.EC2_SSH_KEY }}
-          script: |
-            sudo chown -R www-data:www-data /var/www/html
-            sudo chmod -R 755 /var/www/html
-            sudo systemctl reload nginx || sudo systemctl restart nginx
-            echo "Deployed successfully at $(date)"
+          switches: -avzr --delete
+          path: dist/
+          remote_path: /var/www/html/
+          remote_host: ${{ secrets.EC2_HOST }}
+          remote_user: ubuntu
+          remote_key: ${{ secrets.EC2_SSH_KEY }}
